@@ -39,8 +39,8 @@ begin
     fSI			= 10.0          # [Hz]
     pSI 		= 0.0e-3 * 1e-2*h # [J/m]
     p_quenchSI 	= 0.0 * 1e-2*h  # [J/m]
-    qSI 		= -2e3*h        # [J]
-    q_quenchSI 	= 0e3*h       # [J]
+    qSI 		= 3e3*h        # [J]
+    q_quenchSI 	= -1e3*h       # [J]
 end
 
 ## Set simulation parameters
@@ -55,10 +55,10 @@ begin
     TsampleN    = 100       # number of points in time domain
 
     # Space domain
-    nx  		= Int(5e2)	# number of spatial domain 
+    nx  		= Int(2^11)	# number of spatial domain 
     # calculate dependent constants
     include(srcdir("Dependent_constants_Li.jl"))
-    xmaxSI 		= 2*RTF
+    xmaxSI 		= 4*RTF
     dxSI 		= 2*xmaxSI/nx
 
     xmax 		= xmaxSI/a⊥
