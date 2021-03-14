@@ -219,7 +219,7 @@ end
 
 function insert_ψt(dict, ψt)
     output = copy(dict)
-    output[:psit] = ψt
+    output["psit"] = ψt
     return output
 end
 

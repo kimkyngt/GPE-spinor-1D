@@ -24,6 +24,7 @@ println("Loading pkgs...")
 @time using OrdinaryDiffEq, DiffEqCallbacks
 @time using Plots, LaTeXStrings
 @time using DrWatson
+@time using JLD2
 using Random
 @quickactivate "Spinor1D"
 gr()
@@ -40,7 +41,7 @@ begin
     pSI 		= 0.0e-3 * 1e-2*h # [J/m]
     p_quenchSI 	= 0.0 * 1e-2*h  # [J/m]
     qSI 		= 3e3*h        # [J]
-    q_quenchSI 	= -1e3*h       # [J]
+    q_quenchSI 	= 0e3*h       # [J]
 end
 
 ## Set simulation parameters
@@ -55,10 +56,10 @@ begin
     TsampleN    = 100       # number of points in time domain
 
     # Space domain
-    nx  		= Int(2^11)	# number of spatial domain 
+    nx  		= Int(2^8)	# number of spatial domain 
     # calculate dependent constants
     include(srcdir("Dependent_constants_Li.jl"))
-    xmaxSI 		= 4*RTF
+    xmaxSI 		= 1.5*RTF
     dxSI 		= 2*xmaxSI/nx
 
     xmax 		= xmaxSI/a⊥
@@ -69,7 +70,7 @@ begin
     reltol_int  = 1e-6
     maxiters_int= Int(1e8)
 
-    params = @dict species Natom f⊥ fSI pSI p_quenchSI qSI q_quenchSI MTseed imTmax dyTmax TsampleN nx xmaxSI
+    params = @strdict species Natom f⊥ fSI pSI p_quenchSI qSI q_quenchSI MTseed imTmax dyTmax TsampleN nx xmaxSI
     c1_1DSI*npeakSI/h
 end
 
@@ -174,7 +175,7 @@ end
 ## save data
 begin
     data_dynamics = insert_ψt(params, ψt_dy)
-    @tagsave(datadir("sims","Li7",  fname*".bson") ,data_dynamics)
+    safesave(datadir("sims","Li7", fname*".jld2") ,data_dynamics)
 end
 
 

@@ -1,6 +1,7 @@
 using Plots
 using QuantumOptics, LaTeXStrings
 using DrWatson
+using JLD2
 @quickactivate "Spinor1D"
 gr()
 
