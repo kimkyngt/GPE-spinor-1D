@@ -59,7 +59,7 @@ begin
     nx  		= Int(2^8)	# number of spatial domain 
     # calculate dependent constants
     include(srcdir("Dependent_constants_Li.jl"))
-    xmaxSI 		= 1.5*RTF
+    xmaxSI 		= 2*RTF
     dxSI 		= 2*xmaxSI/nx
 
     xmax 		= xmaxSI/a⊥
@@ -124,7 +124,7 @@ end
 begin 
     ψg = ψt[end]
     plot_wfn(xx_um, ψg)
-    nTF = max.(npeakSI*1e-6*(1 .- (xx_um*1e-6/RTF).^2), 0*xx_um) # Thomas fermi profile
+    nTF = max.(a⊥ * npeakSI*(1 .- (xx_um*1e-6/RTF).^2), 0*xx_um) # Thomas fermi profile
     plot!(xx_um, nTF, lw = 3, ls=:dot, label = "m0 Thoams-Fermi")
     title!("Found ground state")
     # plot(T, check_norm(ψt))
