@@ -19,7 +19,7 @@ begin
     fSI			= 10.0          # [Hz]
     pSI 		= 1e-3 * 1e-2*h # [J/m]
     p_quenchSI 	= 0.0 * 1e-2*h  # [J/m]
-    qSI 		= 3e3*h        # [J]
+    qSI 		= -11*h        # [J]
     q_quenchSI 	= 0e3*h       # [J]
 end
 
@@ -30,15 +30,15 @@ begin
     # Mersenne Twister seed for instability
     MTseed      = [1 2 3]
     # Time domain
-    imTmax 		= 500 		# imaginary time max in units of [1/ω⊥]
-    dyTmax 		= 500   
-    TsampleN    = 100       # number of points in time domain
+    imTmax 		= 6000		# imaginary time max in units of [1/ω⊥]
+    dyTmax 		= 1   
+    TsampleN    = 10       # number of points in time domain
 
     # Space domain
     nx  		= Int(2^8)	# number of spatial domain 
     # calculate dependent constants
     include(srcdir("Dependent_constants_Li.jl"))
-    xmaxSI 		= 1.5*RTF
+    xmaxSI 		= 1.2*RTF
     dxSI 		= 2*xmaxSI/nx
 
     xmax 		= xmaxSI/a⊥
@@ -47,7 +47,7 @@ begin
     # Set integrator tolerances
     abstol_int  = 1e-6
     reltol_int  = 1e-6
-    maxiters_int= Int(1e8)
+    maxiters_int= Int(1e6)
 
     params = @strdict species Natom f⊥ fSI pSI p_quenchSI qSI q_quenchSI MTseed imTmax dyTmax TsampleN nx xmaxSI
     c1_1DSI*npeakSI/h
@@ -100,17 +100,20 @@ end
 
 ##
 function plot_spinor_density(ψ; kwargs...)
-    x = range(-xmaxSI/RTF, xmaxSI/RTF, length = nx)
-    n1 = abs2.(getblock(ψ,1).data) 
-    n2 = abs2.(getblock(ψ,2).data) 
-    n3 = abs2.(getblock(ψ,3).data) 
-    plt = plot(x, n1,  label = "+1", lw = 1,fillrange = 0, fillalpha = 0.35, framestyle = :box; kwargs...)
-    plot!(x, n2,  label = "0", lw = 1, fillrange = 0, fillalpha = 0.35)
-    plot!(x, n3, label = "-1", lw = 1, fillrange = 0, fillalpha = 0.35)
+    x = range(-xmaxSI, xmaxSI, length = nx)*1e6
+    n1 = abs2.(getblock(ψ,1).data) /a⊥*1e-6
+    n2 = abs2.(getblock(ψ,2).data) /a⊥*1e-6
+    n3 = abs2.(getblock(ψ,3).data) /a⊥*1e-6
+    plt = plot(x, n1,  label = L"n_{1}", lw = 1,fillrange = 0, fillalpha = 0.35, framestyle = :box; kwargs...)
+    plot!(x, n2,  label = L"n_{0}", lw = 1, fillrange = 0, fillalpha = 0.35)
+    plot!(x, n3, label = L"n_{-1}", lw = 1, fillrange = 0, fillalpha = 0.35)    
+    plot!(x, n1+n2+n3, label = L"n", lw = 1.5)
+    # title!(string(sum(n1+n2+n3)*dxSI*1e6))
     return plt
 end
 
-plt = plot_spinor_density(ψgpe; grid = false, yticks = [], xticks = [])
-xlabel!("Position")
+plt = plot_spinor_density(ψgpe; grid = false)
+xlabel!("Position [µm]")
+ylabel!("Atoms/µm")
 display(plt)
-# savefig(plotsdir("thesis_figure", "polar ground state.svg"))
+# savefig(plotsdir("thesis_figure", "ba_ground.svg"))

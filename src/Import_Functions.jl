@@ -224,7 +224,7 @@ function insert_ψt(dict, ψt)
 end
 
 
-function plot_snapshots(xx, ψt, T)
+function plot_snapshots(xx, ψt, T; kwargs...)
     function plot_one(xx, ψ; timestamp::Float64 = -1.)
         # Plot wavefunction in SI units
         n1 = abs2.(getblock(ψ,1).data) /(a⊥/1e-6)
@@ -249,7 +249,7 @@ function plot_snapshots(xx, ψt, T)
 	plt7 = plot_one(xx, ψt[Int(round(Npsi*7/9))], timestamp = T[Int(round(Npsi*7/9))]/ω⊥);  
 	plt8 = plot_one(xx, ψt[Int(round(Npsi*8/9))], timestamp = T[Int(round(Npsi*8/9))]/ω⊥);  
 	plt9 = plot_one(xx, ψt[Int(round(Npsi*9/9))], timestamp = T[Int(round(Npsi*9/9))]/ω⊥);  
-	plot(plt1, plt2, plt3, plt4, plt5, plt6, plt7, plt8, plt9, layout = (3,3), legend = false)
+	plot(plt1, plt2, plt3, plt4, plt5, plt6, plt7, plt8, plt9, layout = (3,3), legend = false; kwargs...)
 
 
 end

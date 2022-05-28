@@ -98,7 +98,9 @@ end
 
 ## Find ground state wo interaction
 begin
+    ψ0 = initialstate_gaussian(bx, Natom, σ = RTF/2/a⊥, spinratio = [0., 1, 0.])
     c0 = 0
+    c1 = 0
     # Constructing total Hamiltonian
     Hc0 = one(bx) ⊕ one(bx) ⊕ one(bx)
     Hc1 = one(bx) ⊕ one(bx) ⊕ one(bx)

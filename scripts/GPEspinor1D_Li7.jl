@@ -20,48 +20,45 @@ Path: "Spinor1D" folder
 
 ## Load packages
 println("Loading pkgs...")
-@time using QuantumOptics
-@time using OrdinaryDiffEq, DiffEqCallbacks
-@time using Plots, LaTeXStrings
-@time using DrWatson
-@time using JLD2
-using Random
+@time using QuantumOptics, OrdinaryDiffEq, DiffEqCallbacks, DrWatson, JLD2, Random
 @quickactivate "Spinor1D"
-gr()
+include(srcdir("default_plotting_setting.jl"))
 
-## Set physical parameters
+## Set system parameters
 begin
     include(srcdir("Fundamental_constants_SI.jl"))
 
     # Input parameters in SI unit
     species     = "Li7"
     Natom 		= 1e4		    # atom number
-    f⊥ 			= 1.2e3         # [Hz]
+    f⊥ 			= 1.0e3         # [Hz]
     fSI			= 10.0          # [Hz]
     pSI 		= 0.0e-3 * 1e-2*h # [J/m]
     p_quenchSI 	= 0.0 * 1e-2*h  # [J/m]
     qSI 		= 3e3*h        # [J]
     q_quenchSI 	= 0e3*h       # [J]
+
+    # calculate dependent constants
+    include(srcdir("Dependent_constants_Li.jl"))
 end
 
 ## Set simulation parameters
 begin
+    # File name for saving
     fname = "test"
 
     # Mersenne Twister seed for instability
-    MTseed      = [1 2 3]
+    MTseed      = [1 2 3]   # seed for {+1, 0, -1}
+
     # Time domain
     imTmax 		= 100 		# imaginary time max in units of [1/ω⊥]
-    dyTmax 		= 500   
-    TsampleN    = 100       # number of points in time domain
+    dyTmax 		= 500       # dynamics max time [1/ω⊥]
+    TsampleN    = 100       # number of sample points in time domain
 
-    # Space domain
-    nx  		= Int(2^8)	# number of spatial domain 
-    # calculate dependent constants
-    include(srcdir("Dependent_constants_Li.jl"))
+    # Spaitial domain
+    nx  		= Int(2^7)	# number of spatial domain 
     xmaxSI 		= 2*RTF
     dxSI 		= 2*xmaxSI/nx
-
     xmax 		= xmaxSI/a⊥
     dx 			= 2*xmax/nx
 
@@ -70,8 +67,8 @@ begin
     reltol_int  = 1e-6
     maxiters_int= Int(1e8)
 
+    # Collect parameters
     params = @strdict species Natom f⊥ fSI pSI p_quenchSI qSI q_quenchSI MTseed imTmax dyTmax TsampleN nx xmaxSI
-    c1_1DSI*npeakSI/h
 end
 
 ## Intialize simulation. generate basis and prepare initial state
@@ -94,7 +91,7 @@ end
 ## Check potential
 begin
     plot(xx_um, real([Utrap.data[ii, ii] for ii = 1:nx] ), label = "Trapping", lw = 3)
-    plot!(xx_um, real([UZeeman_quench.data[ii, ii] for ii = 1:nx]) , label = "Zeeman energy" , frame = :box, legend = :top, lw = 3)
+    plot!(xx_um, real([UZeeman_quench.data[ii, ii] for ii = 1:nx]) , label = "Zeeman energy" , frame = :box, legend = :best, lw = 3)
     xlabel!("Position [μm]")
     ylabel!("Energy [ħω⊥]")
 end
@@ -117,7 +114,7 @@ begin
     @time tout, ψt = timeevolution.schroedinger_dynamic(T, ψ0, Hgp_im,  callback=ncb, alg = DP5(), abstol=abstol_int, reltol=reltol_int, maxiters=maxiters_int)
     
     # check the result
-    plot_snapshots(xx_um, ψt, T)
+    plot_snapshots(xx_um, ψt, T; size = (800, 600))
 end
 
 ## Check the ground state with Thomas-Fermi
@@ -168,7 +165,7 @@ begin
     @time tout_dy, ψt_dy = timeevolution.schroedinger_dynamic(T_dy, ψt_dy0, Hgp_dy, alg = DP5(), abstol=abstol_int, reltol=reltol_int, maxiters=maxiters_int)
 
     # Check the results
-    plot_snapshots(xx_um, ψt_dy, T_dy)
+    plot_snapshots(xx_um, ψt_dy, T_dy; size = (800, 600))
 end
 
 
@@ -189,7 +186,7 @@ end
 ## Save to animation
 begin
     anim = @animate for ii  = 1:length(ψt_dy)
-        plot_wfn(xx_um, ψt_dy[ii]; ylims = (0, 150))
+        plot_wfn(xx_um, ψt_dy[ii]; ylims = (0, 180))
         annotate!(0, 140, string(round(T_dy[ii]/ω⊥*1e3))*" ms")
     end
     gif(anim, plotsdir("Li7", fname*".gif"), fps = 10) 

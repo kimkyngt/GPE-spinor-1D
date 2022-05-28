@@ -4,4 +4,4 @@ using Plots.PlotMeasures
 using LaTeXStrings
 gr()
 default_font = "Arial"
-default(titlefont = (20, default_font, :black), legendfont = (10, default_font, :black), guidefont = (12, default_font, :black), tickfont = (12, default_font, :black), framestyle = :box, size = (600, 400), dpi = 300, lw = 2, markerstrokewidth = 1.5)
+default(titlefont = (12, default_font, :black), legendfont = (10, default_font, :black), guidefont = (11, default_font, :black), tickfont = (9, default_font, :black), framestyle = :box, size = (400, 300), dpi = 100, lw = 2, markerstrokewidth = 1.5)
